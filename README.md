@@ -1,4 +1,4 @@
-# Theory of Computation problems & solutions in LaTeX
+# Theory of Computation problems & solutions
 
 Problems within fields of automata theory, computability theory, NP-completeness.
 
