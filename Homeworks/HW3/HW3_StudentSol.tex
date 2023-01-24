@@ -1,0 +1,159 @@
+\documentclass{article}
+\usepackage[utf8]{inputenc}
+\usepackage{graphicx}
+\graphicspath{ {./images/} }
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage[T1]{fontenc}
+\usepackage{subcaption}
+\usepackage{wrapfig}
+\usepackage{enumitem}
+\usepackage{cancel}
+\usepackage{xcolor}
+\newcommand\Ccancel[2][black]{\renewcommand\CancelColor{\color{#1}}\cancel{#2}}
+\usepackage{bm}
+\usepackage[colorlinks,bookmarks=false,linkcolor=black,urlcolor=black]{hyperref}
+\usepackage{float}
+\usepackage{mathtools}
+\newcommand{\defeq}{\vcentcolon=}
+\newcommand{\eqdef}{=\vcentcolon}
+\usepackage{mathtools, stmaryrd}
+\usepackage{xparse} \DeclarePairedDelimiterX{\Iintv}[1]{\llbracket}{\rrbracket}{\iintvargs{#1}}
+\NewDocumentCommand{\iintvargs}{>{\SplitArgument{1}{,}}m}
+{\iintvargsaux#1} %
+\NewDocumentCommand{\iintvargsaux}{mm} {#1\mkern1.5mu..\mkern1.5mu#2}
+\usepackage{tikz}
+\usetikzlibrary{automata, positioning, arrows}
+\tikzset{
+->, % makes the edges directed
+>=stealth, % makes the arrow heads bold
+node distance=3cm, % specifies the minimum distance between two nodes. Change if necessary.
+every state/.style={thick, fill=gray!10}, % sets the properties for each ’state’ node
+initial text=$ $, % sets the text that appears on the start arrow
+}
+
+
+
+\title{Theory of Computation \\ Homework 3}
+\author{Tom Nonnenmacher (325341),\quad Sebastian Maier (327504),\\ Sébastien Delsad (326423),\quad Jérémy Chaverot (315858).}
+\date{May 2022}
+
+\begin{document}
+\maketitle
+
+
+\section*{Exercice 1}
+Let $G=(V,E)$ be an undirected graph. A set of vertices $D\subseteq V$ is \textit{dense} if every vertex $v \in V\setminus D$ has a neighbour in $D$ (that is, ($u$, $v$) $\in E$ for some $u\in D$). We define :
+\begin{align*}
+    \textsc{DenseSet}\; =\;\{\,\langle G,\, k\rangle\,:\,G\;\text{has a dense set of size at most}\, k\,\}.
+\end{align*}
+\noindent Prove that \textsc{DenseSet} is \textbf{NP}-complete.
+\bigskip
+\paragraph{Solution} To prove \textsc{DenseSet} is \textbf{NP}-complete, we will first show that \textsc{DenseSet} is in \textbf{NP}. After that, we will show it is \textbf{NP}-hard by reducing the \textsc{VertexCover} problem (known to be \textbf{NP}-complete) to \textsc{DenseSet}.
+
+\paragraph{[NP-membership]} We give a poly-time verifier for \textsc{DenseSet}. It will take ($G,k$) as the problem instance and a set $C$ as the certificate. \\The algorithm will check if:
+\begin{enumerate}[noitemsep, topsep=0pt]
+    \item |$C$| $\leq k$
+    \item $C$ is a subset of $V$
+    \item For every vertex $v$ in $V$, $v$ is either in $C$ or is adjacent to a vertex in $C$.
+\end{enumerate}
+This can be done in polynomial time, that is $O$($V$+$E$).
+
+
+\paragraph{[NP-hardness]} We will carry out a polynomial-time mapping reduction from \textsc{VertexCover} to \textsc{DenseSet}, written as \textsc{VertexCover} $\leq _p$ \textsc{DenseSet}.\newline
+
+\noindent\textbf{Reduction:} Given a graph $G=(V,E)$ and a number $k \in \mathbb{N}^\star$, we design a poly-time computable function $f$ such that $\langle G, k\rangle\in$ \textsc{VertexCover} iff $f(\langle G, k\rangle)\in$ \textsc{DenseSet}. Let $f(\langle G, k\rangle)=\langle G', k'\rangle$, where $G'=(V', E')$, and $V'$, $E'$, and $k'$ are constructed as follows:
+
+\begin{enumerate}[noitemsep, topsep=0pt]
+    \item [-] $V'$ : add all the vertices of $V$.
+    \item [-] $E'$ : add all the edges of $E$, and for every edge $\{u, v\}$ $\in E$, create and add a new vertex to $V'$, that is connected to $u$ and $v$.
+    \item [-] $k'=k+n$, where $n$ denotes the number of isolated vertices (that is incident to no edges) in $G$. Because if a vertex is isolated, the only way it gets dominated is by including it in the dense set.
+\end{enumerate}
+
+\noindent Note that every step can be performed in polynomial time.
+
+\medskip\noindent\textit{Claim:} $G$ has a vertex cover of size $k$ iff $G'$ has a dense set of size k'.
+
+\medskip\noindent ($\Rightarrow$) If $\langle G, k\rangle\in$ \textsc{VertexCover}, then for every edge $\{u, v\}$ $\in E$, either $u$ or $v$ or both are in the vertex cover. Indeed, these vertices are connected to some of the elements in the vertex cover. Same goes for the newly created vertices, since the vertex is adjacent to $u$ and $v$. Finally, if there were any isolated vertices in G, those are added (if not already) inside the vertex cover. This way, all the edges are covered by the vertex cover, and its set of vertices of size $k'=k+n$ forms a dense set in graph $G'$.
+Therefore, if $G$ has a vertex cover of size $k$, then $G'$ has a dense set of size $k'$.
+
+\medskip\noindent ($\Leftarrow$) If $\langle G', k'\rangle\in$ \textsc{DenseSet}, we first remove the $n$ isolated vertices in the dense set. Then for every newly created vertex in the dense set, we replace it by one of the two regular ones, and we still dominate the same vertices. We argue that the resulting set $V$, after this transformation, is a vertex cover of size $k$. Indeed, it holds, since otherwise it would have meant that an edge is not covered, contradicting the initial hypothesis that we have a dense set.
+
+\medskip\noindent This completes our reduction and 
+\begin{align*}
+    \langle G, k\rangle\in\textsc{VertexCover}\; \Leftrightarrow\;\langle G', k'\rangle\in\textsc{DenseSet}.
+\end{align*}
+
+\noindent As \textsc{DenseSet} is in \textbf{NP} and it is \textbf{NP}-hard, \textsc{DenseSet} is \textbf{NP}-complete.
+
+\newpage
+\section*{Exercice 2}
+
+We denote by $\mathbb{Z}$ the set of integers and $\mathbb{N}=\{1, 2, 3,\,\dots\}$ the set of positives integers. We consider the following two variants of \textsc{SubsetSum}:
+\begin{align*}
+    \textsc{SubsetSum}^+\; =\;\{\,\langle X,\, s\rangle\,:\,X\subseteq\mathbb{N}\;\;\text{is a multiset and some subset of}\, X\,\text{sums to}\,s\,\},\\
+    \textsc{SubsetSum}^\pm\; =\;\{\,\langle X,\, s\rangle\,:\,X\subseteq\mathbb{Z}\;\;\text{is a multiset and some subset of}\, X\,\text{sums to}\,s\,\}.
+\end{align*}
+
+We describe a \textit{direct} reduction \textsc{SubsetSum}$^\pm\leq_p$ \textsc{SubsetSum}$^+$.
+\bigskip
+\paragraph{Solution}Let $f$ be a computable function in polynomial time that procedes as follows:
+
+\noindent On input $\langle X,\, s\rangle$:
+\begin{enumerate}[noitemsep, topsep=0pt]
+    \item Compute $A=1+\sum_{i=1} ^{n} |a_i|$, where $n$ is the cardinal of $X$.
+    \item Let $X'= \bigcup _{i=1} ^{n}\{a_i + A\}\;\cup\;\bigcup _{i=1} ^{n}\{A\}$
+    \item Let $s'= s+nA$
+    \item From there, return $\langle X',\, s'\rangle$
+\end{enumerate}
+
+\medskip\noindent\textit{Claim:} The set of integers $X$ has a subset that sums precisely to $s$ iff the set of positive integers $X'$ has a subset that sums precisely to $s'$.
+
+\bigskip\noindent ($\Rightarrow$) Suppose $\langle X,\, s\rangle\in\textsc{SubsetSum}^\pm$.
+\\\smallskip Hence $s$ can be written as:
+$s=\sum_{i=1} ^{m} x_i$, for some $x_i\in X$, $m\leq n$.
+\\\smallskip This implies that:
+$\sum_{i=1} ^{m} (x_i+A) = x+mA$.
+\\\smallskip Note that $x_i+A>0$ as $A=1+\sum_{i=1} ^{n} |a_i|\geq|x_i|+1>|x_i|$ for all $x_i\in X$.
+\\\smallskip Then we have that:
+\\$\sum_{i=1} ^{m} (x_i+A)+\sum_{i=1} ^{n-m} A=s+mA+(n-m)A=x+nA=s'$
+
+\smallskip\noindent Here note that $m\leq n\Rightarrow n-m \geq 0$.
+
+\smallskip\noindent We have that $x_i +A\in X'$ and we also have the number $A$ shows $n$ times in $X'$, which makes it possible to choose $(n-m)$ times the number $A$ in $X'$ (as $n\leq m$).
+
+\medskip\noindent Therefore, if $\langle X,\, s\rangle$ is in $\textsc{SubsetSum}^\pm$, then $\langle X',\, s'\rangle$ is in $\textsc{SubsetSum}^+$.
+
+\bigskip
+\bigskip\noindent ($\Leftarrow$) Suppose $f(\langle X,\, s\rangle)=\langle X',\, s'\rangle\in\textsc{SubsetSum}^+$.
+\\Let $n=|X|$ and $s'=s+nA$.
+\\We also have $X'=\,\{\,a_1+A,\,\dots,\,a_n+A,\,A,\,\dots,\,A\,\}$ with $A$ appearing $n$ times.
+
+\medskip\noindent Let $\{\,r_1,\,\dots,\,r_m\,\}$ $\subset$ $\{\,1,\,\dots,\,2n\,\}$ be a list of indices of $X'$ such that:
+\\ $\sum_{i=1} ^{m} X'_{r_i}=s+An$
+
+\medskip$\Rightarrow\sum_{i=1} ^{m} (b_{r_i}+A)=s+An$, where  $$b_{r_i} = \left\{\begin{array}{ll}
+ a_{r_i} & \mbox{ if $1\leq r_i\leq n$}\\
+ 0 & \mbox{ otherwise}
+ \end{array}\right.$$
+ 
+\medskip $\Rightarrow\sum_{i=1} ^{m} b_{r_i}+mA=s+An\quad\quad (1)$
+
+\medskip\noindent Note that the sum, denoted $z$, of any subset of $S$ is such that $-(A-1)\leq z \leq A-1$ $\Rightarrow -A+1\leq\sum_{i=1} ^{m} b_{r_i} \leq A-1$. We also have that $-A+1\leq s \leq A-1$.
+
+\medskip\noindent And as $\langle X',\, s'\rangle$ is in $\textsc{SubsetSum}^+$, in equation (1), $n$ must be equal to $m$. If it was not the case, then it wouldn't be possible to have $b_{r_i}$ and $s$ such that the equation (1) holds.
+
+\medskip $\Rightarrow\,n=m\,\Rightarrow\sum_{i=1} ^{m} b_{r_i}+mA=\sum_{i=1} ^{n} b_{r_i}+nA$
+
+\medskip $\Rightarrow\sum_{i=1} ^{n} b_{r_i}+nA=s+An$
+
+\medskip $\Rightarrow\sum_{i=1} ^{n} b_{r_i}=s$
+
+\medskip\noindent We can just remove from the sum the values of $b_{r_i}$ that are 0.
+\\Thus we get that $\sum_{i=1,\,1\leq r_i\leq n} ^{n} a_{r_i}=s$.
+
+\medskip\noindent Therefore, if $f(\langle X,\, s\rangle)$ is in $\textsc{SubsetSum}^+$, then $\langle X,\, s\rangle$ is in $\textsc{SubsetSum}^\pm$.
+
+\bigskip\noindent This completes our reduction and \textsc{SubsetSum}$^\pm\leq_p$ \textsc{SubsetSum}$^+$.
+
+\end{document}
