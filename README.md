@@ -6,5 +6,7 @@ These homeworks were conducted within the framework of the Theory of Computation
 
 I do not claim that the solutions we provided are correct nor exhaustive. Please refer to the instructor's ones.
 
-Date: March-May 2022
+
 Author of the LaTeX files: Jeremy Chaverot.
+
+Date: March-May 2022
