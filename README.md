@@ -9,4 +9,4 @@ I do not claim that the solutions we provided are correct nor exhaustive. Please
 
 Author of the LaTeX files: Jeremy Chaverot.
 
-Date: March-May 2022
+Date: March-May 2022.
